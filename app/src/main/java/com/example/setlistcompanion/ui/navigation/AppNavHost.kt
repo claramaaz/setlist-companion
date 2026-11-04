@@ -1,0 +1,72 @@
+package com.example.setlistcompanion.ui.navigation
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+
+// Bottom bar + navigation between the two features.
+// Each feature replaces ONLY its own placeholder composable(...) below.
+@Composable
+fun SetlistCompanionApp() {
+    val navController = rememberNavController()
+    val tabs = listOf(Screen.Repertoire, Screen.Setlists)
+
+    Scaffold(
+        bottomBar = {
+            NavigationBar {
+                val backStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = backStackEntry?.destination?.route
+                tabs.forEach { screen ->
+                    NavigationBarItem(
+                        selected = currentRoute == screen.route,
+                        onClick = {
+                            navController.navigate(screen.route) {
+                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = { Icon(screen.icon, contentDescription = screen.label) },
+                        label = { Text(screen.label) }
+                    )
+                }
+            }
+        }
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Repertoire.route,
+            // Only the bottom padding: each screen's own top bar handles the top.
+            // consumeWindowInsets stops the inner screens from adding the bottom space twice.
+            modifier = Modifier
+                .padding(bottom = innerPadding.calculateBottomPadding())
+                .consumeWindowInsets(PaddingValues(bottom = innerPadding.calculateBottomPadding()))
+        ) {
+            // ---------- Feature 1: Repertoire (Clara) ----------
+            composable(Screen.Repertoire.route) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Repertoire") }
+            }
+
+            // ---------- Feature 2: Setlists (Mia) ----------
+            composable(Screen.Setlists.route) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Setlists") }
+            }
+        }
+    }
+}
