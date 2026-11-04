@@ -3,6 +3,7 @@ package com.example.setlistcompanion
 import android.content.Context
 import androidx.room.Room
 import com.example.setlistcompanion.data.local.AppDatabase
+import com.example.setlistcompanion.data.song.SongRepository
 
 // Manual dependency injection: builds the database once.
 // Each feature adds its repository here (one line each), e.g.
@@ -16,4 +17,7 @@ class AppContainer(context: Context) {
     )
         .fallbackToDestructiveMigration(dropAllTables = true) // dev only: wipes data when version changes
         .build()
+
+    // Feature 1: Repertoire
+    val songRepository = SongRepository(database.songDao())
 }
