@@ -15,10 +15,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.setlistcompanion.ui.repertoire.SongEditScreen
+import com.example.setlistcompanion.ui.repertoire.SongListScreen
 
 // Bottom bar + navigation between the two features.
 // Each feature replaces ONLY its own placeholder composable(...) below.
@@ -60,7 +64,18 @@ fun SetlistCompanionApp() {
         ) {
             // ---------- Feature 1: Repertoire (Clara) ----------
             composable(Screen.Repertoire.route) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Repertoire") }
+                SongListScreen(
+                    onAddSong = { navController.navigate("song_edit/-1") },
+                    onSongClick = { id -> navController.navigate("song_edit/$id") }
+                )
+            }
+            // "{songId}" is an argument in the route; -1 means "new song".
+            composable(
+                route = "song_edit/{songId}",
+                arguments = listOf(navArgument("songId") { type = NavType.LongType })
+            ) { entry ->
+                val songId = entry.arguments?.getLong("songId") ?: -1L
+                SongEditScreen(songId = songId, onDone = { navController.popBackStack() })
             }
 
             // ---------- Feature 2: Setlists (Mia) ----------
