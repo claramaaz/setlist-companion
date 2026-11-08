@@ -1,9 +1,7 @@
 package com.example.setlistcompanion.ui.navigation
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -12,7 +10,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -23,6 +20,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.setlistcompanion.ui.repertoire.SongEditScreen
 import com.example.setlistcompanion.ui.repertoire.SongListScreen
+import com.example.setlistcompanion.ui.setlists.SetlistDetailScreen
+import com.example.setlistcompanion.ui.setlists.SetlistListScreen
 
 // Bottom bar + navigation between the two features.
 // Each feature replaces ONLY its own placeholder composable(...) below.
@@ -80,7 +79,14 @@ fun SetlistCompanionApp() {
 
             // ---------- Feature 2: Setlists (Mia) ----------
             composable(Screen.Setlists.route) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text("Setlists") }
+                SetlistListScreen(onSetlistClick = { id -> navController.navigate("setlist_detail/$id") })
+            }
+            composable(
+                route = "setlist_detail/{setlistId}",
+                arguments = listOf(navArgument("setlistId") { type = NavType.LongType })
+            ) { entry ->
+                val setlistId = entry.arguments?.getLong("setlistId") ?: -1L
+                SetlistDetailScreen(setlistId = setlistId, onBack = { navController.popBackStack() })
             }
         }
     }
